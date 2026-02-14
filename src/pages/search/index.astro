@@ -1,0 +1,87 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getArtists, getForms, getFestivals, getCities, getInstruments, getThemes, splitSemicolon } from '../../lib/supabase';
+
+const [artists, forms, festivals, cities, instruments, themes] = await Promise.all([
+  getArtists(), getForms(), getFestivals(), getCities(), getInstruments(), getThemes(),
+]);
+
+// Build search index
+const index = [
+  ...artists.map(a => ({ type: 'artist', slug: `/performers/${a.slug}`, name: a.name, nameAr: a.name_ar, desc: a.biography?.slice(0, 100) || '', meta: `${a.type} · ${a.base_city} · ${splitSemicolon(a.performance_forms).join(', ')}` })),
+  ...forms.map(f => ({ type: 'tradition', slug: `/forms/${f.slug}`, name: f.name, nameAr: f.name_ar, desc: f.description?.slice(0, 100) || '', meta: `${f.category} · ${f.origin_region}` })),
+  ...festivals.map(f => ({ type: 'festival', slug: `/festivals/${f.slug}`, name: f.name, nameAr: f.name_ar, desc: f.description?.slice(0, 100) || '', meta: `${f.city} · ${f.frequency}` })),
+  ...cities.map(c => ({ type: 'city', slug: `/cities/${c.slug}`, name: c.name, nameAr: c.name_ar, desc: c.description?.slice(0, 100) || '', meta: c.region })),
+  ...instruments.map(i => ({ type: 'instrument', slug: `/instruments/${i.slug}`, name: i.name, nameAr: i.name_ar, desc: i.description?.slice(0, 100) || '', meta: `${i.family} · ${i.type}` })),
+  ...themes.map(t => ({ type: 'theme', slug: `/themes/${t.slug}`, name: t.name, nameAr: t.name_ar, desc: t.description?.slice(0, 100) || '', meta: t.category })),
+];
+
+const total = index.length;
+---
+
+<Base title="Search — Music in Morocco" description="Search across all Moroccan performance traditions, artists, instruments, festivals, and cities.">
+  <div class="section-inner">
+    <div class="page-header">
+      <span class="micro-label">Search</span>
+      <h1>Search</h1>
+      <p class="page-desc">{total} items across artists, traditions, instruments, festivals, cities, and themes.</p>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="q" placeholder="Search…" autofocus />
+      <button id="clear" type="button">×</button>
+    </div>
+
+    <div id="results"></div>
+  </div>
+
+  <script define:vars={{ index }}>
+    const input = document.getElementById('q');
+    const clearBtn = document.getElementById('clear');
+    const resultsEl = document.getElementById('results');
+
+    // Read ?q= from URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('q')) { input.value = params.get('q'); doSearch(); }
+
+    input.addEventListener('input', doSearch);
+    clearBtn.addEventListener('click', () => { input.value = ''; doSearch(); input.focus(); });
+
+    function doSearch() {
+      const q = input.value.toLowerCase().trim();
+      if (!q) { resultsEl.innerHTML = '<p class="no-q">Type to search across all content.</p>'; return; }
+
+      const results = index.filter(item => {
+        const haystack = `${item.name} ${item.nameAr} ${item.desc} ${item.meta}`.toLowerCase();
+        return haystack.includes(q);
+      });
+
+      if (results.length === 0) {
+        resultsEl.innerHTML = `<p class="no-q">No results for "${input.value}".</p>`;
+        return;
+      }
+
+      resultsEl.innerHTML = results.map(r => `
+        <a href="${r.slug}" class="sr">
+          <span class="sr-type">${r.type}</span>
+          <span class="sr-name">${r.name}</span>
+          <span class="sr-meta">${r.meta}</span>
+        </a>
+      `).join('');
+    }
+  </script>
+</Base>
+
+<style>
+  .search-box { position: relative; margin-bottom: var(--space-md); }
+  .search-box input { width: 100%; font-family: var(--font-body); font-size: 1rem; font-weight: 300; padding: 0.6rem 0; border: none; border-bottom: 2px solid var(--color-ink); outline: none; background: transparent; }
+  .search-box input::placeholder { color: var(--color-ink-muted); }
+  #clear { position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.2rem; color: var(--color-ink-muted); cursor: pointer; }
+  :global(.no-q) { font-size: 0.85rem; color: var(--color-ink-muted); font-weight: 300; }
+  :global(.sr) { display: grid; grid-template-columns: 80px 1fr auto; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--color-border); align-items: baseline; transition: padding-left 0.15s; }
+  :global(.sr:hover) { padding-left: 0.4rem; }
+  :global(.sr-type) { font-size: 0.55rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink-muted); }
+  :global(.sr-name) { font-family: var(--font-display); font-size: 0.95rem; }
+  :global(.sr-meta) { font-size: 0.65rem; font-weight: 300; color: var(--color-ink-muted); }
+  @media (max-width: 640px) { :global(.sr) { grid-template-columns: 1fr; gap: 0.1rem; } }
+</style>

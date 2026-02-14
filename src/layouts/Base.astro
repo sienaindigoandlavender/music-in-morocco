@@ -1,0 +1,208 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description, image } = Astro.props;
+import { getSiteSettings, getNexusLegalPages } from '../lib/supabase';
+
+const settings = await getSiteSettings();
+const legalPages = await getNexusLegalPages();
+
+const desc = description || settings.meta_description || 'Music in Morocco — music, dance, and ritual performance traditions across Morocco.';
+const currentPath = Astro.url.pathname;
+let canonicalPath = currentPath;
+if (canonicalPath !== '/' && canonicalPath.endsWith('/')) canonicalPath = canonicalPath.slice(0, -1);
+const SITE = 'https://musicinmorocco.com';
+const canonicalUrl = `${SITE}${canonicalPath}`;
+---
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{title}</title>
+  <meta name="title" content={title}>
+  <meta name="description" content={desc}>
+  <meta name="author" content="Slow Morocco">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+  <link rel="canonical" href={canonicalUrl}>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content={canonicalUrl}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={desc}>
+  <meta property="og:image" content={image || `${SITE}/og-image.jpg`}>
+  <meta property="og:site_name" content="Music in Morocco">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={title}>
+  <meta name="twitter:description" content={desc}>
+  <meta name="twitter:image" content={image || `${SITE}/og-image.jpg`}>
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Music in Morocco",
+    "alternateName": "MIM",
+    "url": SITE,
+    "description": "Comprehensive reference for Moroccan performance traditions — music, dance, and ritual including Gnawa, Ahwach, Andalusi, Rwais, Aita, and more.",
+    "inLanguage": "en",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Slow Morocco",
+      "url": "https://www.slowmorocco.com",
+      "address": { "@type": "PostalAddress", "addressLocality": "Marrakech", "addressCountry": "MA" }
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${SITE}/search?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  })} />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE },
+      ...(currentPath !== '/' ? [{
+        "@type": "ListItem", "position": 2,
+        "name": title.split(' — ')[0], "item": canonicalUrl
+      }] : [])
+    ]
+  })} />
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0KVNG6FYZG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0KVNG6FYZG');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <span class="logo-mark">MIM</span>
+        <span class="logo-full">Music in Morocco</span>
+      </a>
+      <nav class="main-nav">
+        <a href="/search">Search</a>
+        <a href="/performers">Artists</a>
+        <a href="/forms">Traditions</a>
+        <a href="/instruments">Instruments</a>
+        <a href="/festivals">Festivals</a>
+        <a href="/cities">Cities</a>
+      </nav>
+    </div>
+  </header>
+
+  <slot />
+
+  <footer class="site-footer">
+    <div class="footer-l1">
+      <div class="footer-l1-inner">
+        <div class="footer-site-links">
+          <a href="/search">Search</a>
+          <a href="/performers">Artists</a>
+          <a href="/forms">Traditions</a>
+          <a href="/instruments">Instruments</a>
+          <a href="/festivals">Festivals</a>
+          <a href="/cities">Cities</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-l2">
+      <div class="footer-l2-inner">
+        <div class="footer-legal">
+          {legalPages.map(p => <a href={`/legal/${p.page_id}`}>{p.page_title}</a>)}
+        </div>
+      </div>
+    </div>
+    <div class="footer-l3">
+      <div class="footer-l3-inner">
+        <div class="footer-copy">
+          <span>© {new Date().getFullYear()} Slow Morocco</span>
+          <a href="https://www.slowmorocco.com/" target="_blank" rel="noopener">Powered by Slow Morocco</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
+
+<style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --font-display: 'Instrument Serif', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --color-bg: #ffffff;
+    --color-ink: #111111;
+    --color-ink-light: #444444;
+    --color-ink-muted: #777777;
+    --color-border: #e0e0e0;
+    --color-border-dark: #999999;
+    --color-surface: #f5f5f5;
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 2rem;
+    --space-lg: 4rem;
+    --space-xl: 6rem;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body { font-family: var(--font-body); font-weight: 400; color: var(--color-ink); background: var(--color-bg); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+
+  .section-inner { max-width: 1200px; margin: 0 auto; padding: var(--space-xl) var(--space-md) var(--space-lg); }
+  .page-header { padding-bottom: var(--space-md); }
+  .micro-label { display: block; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-ink-muted); margin-bottom: 0.3rem; }
+  .page-header h1 { font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 400; line-height: 1.05; letter-spacing: -0.02em; }
+  .page-desc { font-size: 0.92rem; font-weight: 300; color: var(--color-ink-muted); margin-top: 0.4rem; max-width: 600px; }
+</style>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 100; background: var(--color-bg); border-bottom: 1px solid var(--color-border); }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem var(--space-md); max-width: 1200px; margin: 0 auto; }
+  .logo { display: flex; align-items: center; gap: 0.6rem; }
+  .logo-mark { font-family: var(--font-body); font-weight: 600; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; border: 1.5px solid var(--color-ink); padding: 0.25rem 0.45rem; }
+  .logo-full { font-family: var(--font-display); font-size: 0.95rem; }
+  .main-nav { display: flex; gap: 1.2rem; }
+  .main-nav a { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-muted); transition: color 0.15s; }
+  .main-nav a:hover { color: var(--color-ink); }
+
+  .site-footer { border-top: 1px solid var(--color-border); margin-top: var(--space-lg); }
+  .footer-l1 { background: #1f1f1f; padding: var(--space-md); }
+  .footer-l2 { background: #161616; padding: var(--space-sm) var(--space-md); }
+  .footer-l3 { background: #0e0e0e; padding: 0.8rem var(--space-md); }
+  .footer-l1-inner, .footer-l2-inner, .footer-l3-inner { max-width: 1200px; margin: 0 auto; }
+  .footer-site-links { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+  .footer-site-links a { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); transition: color 0.15s; }
+  .footer-site-links a:hover { color: rgba(255,255,255,0.9); }
+  .footer-legal { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .footer-legal a { font-size: 0.55rem; color: rgba(255,255,255,0.35); transition: color 0.15s; }
+  .footer-legal a:hover { color: rgba(255,255,255,0.6); }
+  .footer-copy { font-size: 0.5rem; color: rgba(255,255,255,0.25); display: flex; justify-content: space-between; align-items: center; }
+  .footer-copy a { color: rgba(255,255,255,0.35); }
+
+  @media (max-width: 768px) {
+    .main-nav { display: none; }
+  }
+</style>

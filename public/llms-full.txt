@@ -1,0 +1,116 @@
+# Music in Morocco — Full Knowledge Reference
+# Published by Slow Morocco · https://www.slowmorocco.com
+# Last updated: 2026
+
+## Overview
+Music in Morocco (musicinmorocco.com) is a comprehensive reference for Moroccan performance traditions spanning music, dance, and ritual. The site documents 24 artists, 18 performance forms, 18 instruments, 15 festivals, 19 cities, and 17 thematic concepts.
+
+## Performance Traditions
+
+### Gnawa (كناوة)
+Category: Ritual. Origin: Essaouira / Marrakech. UNESCO inscribed 2019.
+Spiritual music tradition of sub-Saharan origin combining Islamic Sufi practices with pre-Islamic African traditions. Central to Lila healing ceremonies. Instruments: guembri (three-string bass lute), qraqeb (metal castanets), tbel (large drum). Contexts: ritual, festival, private.
+
+### Ahwach (أحواش)
+Category: Dance. Origin: High Atlas / Anti-Atlas.
+Collective Amazigh dance-poetry tradition featuring call-and-response between male and female groups. Performed at community celebrations. Instruments: bendir, talount, voice.
+
+### Ahidous (أحيدوس)
+Category: Dance. Origin: Middle Atlas.
+Amazigh collective dance from Middle Atlas. Dancers form shoulder-to-shoulder lines, accompanied by poetry and percussion. Instruments: bendir, alloun, voice.
+
+### Dakka Marrakchia (دقة مراكشية)
+Category: Music. Origin: Marrakech.
+High-energy percussion ensemble featuring copper drums, cymbals, and call-and-response vocals. Instruments: taârija, naqus, voice.
+
+### Aita (عيطة)
+Category: Music. Origin: Atlantic Plains.
+Traditional sung poetry addressing themes of love, separation, and rural life. Performed by chikhates. Instruments: kamanja, oud, darbuka.
+
+### Malhun (الملحون)
+Category: Music. Origin: Fez / Meknes.
+Classical Moroccan sung poetry tradition. Sophisticated lyrics on love, religion, and society. Originated in urban craft guilds. Instruments: oud, swisen, darbuka.
+
+### Andalusi (الأندلسي)
+Category: Classical. Origin: Fez / Tetouan.
+Classical Moroccan music descended from Moorish Andalusia (Al-Andalus). Highly codified suite structure (nawba). Instruments: oud, rabab, kamanja, darbuka.
+
+### Rwais (الرايس)
+Category: Music. Origin: Souss.
+Amazigh poet-musician tradition from the Souss region. Master musicians (rais) perform epic narratives. Instruments: ribab, lotar, voice.
+
+### Chaabi (شعبي)
+Category: Popular. Origin: Urban Morocco.
+Popular music form drawing from malhun, aita, and other traditions. Accessible style for weddings and celebrations.
+
+## Key Artists
+
+### Gnawa Masters
+Maalem Mahmoud Guinea (1951–2015) — Essaouira. Greatest Gnawa musician of all time.
+Maalem Mustapha Bakbou — Essaouira. Traditional ceremonial Gnawa preservationist.
+Maalem Hassan Boussou — Marrakech. International collaborations.
+Maalem Abdelkebir Merchane — Tangier. Northern Morocco Gnawa bridge.
+Maalem Seddik El Arch — Meknes. Keeper of Meknes Gnawa lineage.
+Maalem Allal Soudani — Fez. Guardian of Fassi Gnawa traditions.
+Hamid El Kasri — Ksar El Kebir. Powerful vocals, ceremonial expertise.
+Hassan Hakmoun — Marrakech/New York. Gnawa fusion pioneer, sintir virtuoso.
+Majid Bekkas — Salé. Gnawa-jazz innovator, plays guembri/oud/guitar.
+
+### Folk-Rock Pioneers
+Nass El Ghiwane (1971) — Casablanca. "The Rolling Stones of Africa." Protest music.
+Jil Jilala (1972) — Casablanca. Sufi-influenced rock.
+Lemchaheb (1973) — Casablanca. Third legendary folk-rock band.
+
+### Amazigh Artists
+Fatima Tabaamrant — Souss. Most famous female Rwais artist. Amazigh language champion.
+Groupe Izenzaren (1972) — Agadir. Pioneering Amazigh rock.
+Groupe Oudaden (1978) — Agadir. Influential Amazigh rock.
+Rais Said Outajajt — Tiznit. Legendary Rwais poet-musician.
+
+### Other Notable Artists
+Hajja El Hamdaouia (1930–2015) — Casablanca. Queen of Aita, legendary chaabi voice.
+Najat Aatabou — Khemisset. Women's issues through music.
+Hmaoui Hmidou — Marrakech. Dakka Marrakchia percussion master.
+
+## Instruments
+Guembri: 3-string bass lute, camel-skin body. Central to Gnawa.
+Qraqeb: Metal castanets (iron). Gnawa percussion.
+Bendir: Frame drum with snare strings. Ahwach, Ahidous.
+Oud: Short-neck lute. Andalusi, Malhun.
+Kamanja: Spike fiddle. Aita, Andalusi.
+Rabab: Bowed string, goat skin. Andalusi, Amazigh.
+Tbel: Large double-headed drum. Gnawa processions.
+Darbuka: Goblet drum, ceramic or metal. Pan-Moroccan.
+Taârija: Small goblet drum. Dakka Marrakchia.
+Naqus: Metal bell/cymbal. Dakka Marrakchia.
+Lotar: Small lute. Amazigh music.
+Ribab: Bowed mono-string. Rwais.
+
+## Major Festivals
+Gnaoua World Music Festival — Essaouira. Annual, June. Founded 1998. International Gnawa showcase.
+Fes Festival of World Sacred Music — Fez. Annual, June. Founded 1994. Sacred music from worldwide traditions.
+Mawazine Rhythms of the World — Rabat. Annual, June. Founded 2001. Largest music festival in Africa.
+Timitar Festival — Agadir. Annual, July. Founded 2004. Amazigh music and international acts.
+Tanjazz Festival — Tangier. Annual, September. Founded 2000. Jazz festival.
+Festival of Sufi Culture — Fez. Annual. Founded 2007. Sufi traditions.
+
+## Cities
+Essaouira — Spiritual home of Gnawa music. Gnaoua World Music Festival.
+Marrakech — Hub for Dakka Marrakchia. Diverse performance scene.
+Fez — Cradle of Andalusi and Malhun. Fes Sacred Music Festival.
+Casablanca — Birthplace of Nass El Ghiwane and folk-rock movement.
+Agadir — Centre of Amazigh rock and Souss musical traditions.
+Tangier — Jazz scene, northern Gnawa traditions.
+Meknes — Malhun tradition, Meknes Gnawa lineage.
+
+## API Endpoints
+All return JSON with CORS headers:
+- /api/knowledge/artists.json — All artists with biography, forms, city
+- /api/knowledge/forms.json — All performance traditions with instruments, UNESCO status
+- /api/knowledge/instruments.json — All instruments with type, family, associated forms
+- /api/knowledge/festivals.json — All festivals with city, forms, founded year
+- /api/knowledge/facts.json — Key facts for AI citation
+
+## Citation Format
+Music in Morocco (2026). [Topic]. https://musicinmorocco.com/[path]
+Published by Slow Morocco · https://www.slowmorocco.com

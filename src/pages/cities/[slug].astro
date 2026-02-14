@@ -1,0 +1,85 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCities, getCityBySlug, getArtistsByCity, getFestivalsByCity, splitSemicolon } from '../../lib/supabase';
+
+export async function getStaticPaths() {
+  const cities = await getCities();
+  return cities.map(c => ({ params: { slug: c.slug } }));
+}
+
+const { slug } = Astro.params;
+const city = await getCityBySlug(slug!);
+if (!city) return Astro.redirect('/cities');
+
+const [artists, festivals] = await Promise.all([
+  getArtistsByCity(city.name),
+  getFestivalsByCity(city.name),
+]);
+
+const faqSchema = {
+  "@context": "https://schema.org", "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": `What music is ${city.name} known for?`, "acceptedAnswer": { "@type": "Answer", "text": city.description } },
+    { "@type": "Question", "name": `What music festivals are in ${city.name}?`, "acceptedAnswer": { "@type": "Answer", "text": festivals.length > 0 ? `${city.name} hosts ${festivals.map(f => f.name).join(', ')}.` : `No major music festivals are currently documented in ${city.name}.` } },
+  ],
+};
+---
+
+<Base title={`${city.name} — Music in Morocco`} description={city.description?.slice(0, 160)}>
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <div class="section-inner">
+    <div class="page-header">
+      <span class="micro-label">{city.region}</span>
+      <h1>{city.name}</h1>
+      {city.name_ar && <p class="name-ar">{city.name_ar}</p>}
+    </div>
+
+    <section class="desc"><p>{city.description}</p></section>
+
+    {artists.length > 0 && (
+      <section class="rel">
+        <h2>Artists</h2>
+        <div class="rel-list">
+          {artists.map(a => (
+            <a href={`/performers/${a.slug}`} class="rel-row">
+              <span class="rl-cat">{a.type}</span>
+              <span class="rl-name">{a.name}</span>
+              <span class="rl-desc">{splitSemicolon(a.performance_forms).join(', ')}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {festivals.length > 0 && (
+      <section class="rel">
+        <h2>Festivals</h2>
+        <div class="rel-list">
+          {festivals.map(f => (
+            <a href={`/festivals/${f.slug}`} class="rel-row">
+              <span class="rl-cat">{f.frequency}</span>
+              <span class="rl-name">{f.name}</span>
+              <span class="rl-desc">{splitSemicolon(f.performance_forms).join(', ')}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</Base>
+
+<style>
+  .name-ar { font-size: 1.2rem; color: var(--color-ink-muted); direction: rtl; margin-top: 0.2rem; }
+  .desc { margin-bottom: var(--space-md); }
+  .desc p { font-size: 0.92rem; font-weight: 300; line-height: 1.65; color: var(--color-ink-light); max-width: 700px; }
+  .rel { margin-bottom: var(--space-md); }
+  .rel h2 { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--color-border); }
+  .rel-list { display: flex; flex-direction: column; }
+  .rel-row { display: grid; grid-template-columns: 90px 1fr 1fr; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--color-border); align-items: baseline; transition: padding-left 0.15s; }
+  .rel-row:hover { padding-left: 0.4rem; }
+  .rl-cat { font-size: 0.55rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink-muted); }
+  .rl-name { font-family: var(--font-display); font-size: 0.95rem; }
+  .rl-desc { font-size: 0.72rem; font-weight: 300; color: var(--color-ink-muted); }
+  @media (max-width: 640px) { .rel-row { grid-template-columns: 1fr; gap: 0.1rem; } }
+</style>

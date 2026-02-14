@@ -1,0 +1,69 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getFestivals, splitSemicolon } from '../../lib/supabase';
+
+const festivals = await getFestivals();
+const active = festivals.filter(f => f.status?.toLowerCase() === 'active');
+const inactive = festivals.filter(f => f.status?.toLowerCase() !== 'active');
+---
+
+<Base title="Festivals — Music in Morocco" description={`${festivals.length} music festivals across Morocco — Gnaoua, Sacred Music, Mawazine, Timitar, and more.`}>
+  <div class="section-inner">
+    <div class="page-header">
+      <span class="micro-label">Events</span>
+      <h1>Festivals</h1>
+      <p class="page-desc">{festivals.length} music festivals across Morocco.</p>
+    </div>
+
+    <section class="group">
+      <h2 class="group-title">Active</h2>
+      <div class="fest-list">
+        {active.map(f => (
+          <a href={`/festivals/${f.slug}`} class="fest-row">
+            <span class="f-city">{f.city}</span>
+            <div class="f-main">
+              <span class="f-name">{f.name}</span>
+              {f.name_ar && <span class="f-ar">{f.name_ar}</span>}
+            </div>
+            <span class="f-freq">{f.frequency}</span>
+            <span class="f-forms">{splitSemicolon(f.performance_forms).join(', ')}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    {inactive.length > 0 && (
+      <section class="group">
+        <h2 class="group-title">Inactive / Historical</h2>
+        <div class="fest-list">
+          {inactive.map(f => (
+            <a href={`/festivals/${f.slug}`} class="fest-row inactive">
+              <span class="f-city">{f.city}</span>
+              <div class="f-main">
+                <span class="f-name">{f.name}</span>
+              </div>
+              <span class="f-freq">{f.frequency}</span>
+              <span class="f-forms">{splitSemicolon(f.performance_forms).join(', ')}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</Base>
+
+<style>
+  .group { margin-bottom: var(--space-md); }
+  .group-title { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-ink-muted); padding-bottom: 0.4rem; border-bottom: 2px solid var(--color-ink); }
+  .fest-list { display: flex; flex-direction: column; }
+  .fest-row { display: grid; grid-template-columns: 120px 1fr 100px auto; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--color-border); align-items: baseline; transition: padding-left 0.15s; }
+  .fest-row:hover { padding-left: 0.4rem; }
+  .fest-row.inactive { opacity: 0.5; }
+  .f-city { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-muted); }
+  .f-main { display: flex; align-items: baseline; gap: 0.5rem; }
+  .f-name { font-family: var(--font-display); font-size: 1.05rem; }
+  .f-ar { font-size: 0.8rem; color: var(--color-ink-muted); direction: rtl; }
+  .f-freq { font-size: 0.65rem; color: var(--color-ink-muted); }
+  .f-forms { font-size: 0.72rem; font-weight: 300; color: var(--color-ink-muted); }
+  @media (max-width: 768px) { .fest-row { grid-template-columns: 1fr; gap: 0.15rem; } }
+</style>

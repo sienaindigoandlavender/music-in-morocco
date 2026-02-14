@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getThemes, getThemeBySlug } from '../../lib/supabase';
+
+export async function getStaticPaths() {
+  const themes = await getThemes();
+  return themes.map(t => ({ params: { slug: t.slug } }));
+}
+
+const { slug } = Astro.params;
+const theme = await getThemeBySlug(slug!);
+if (!theme) return Astro.redirect('/themes');
+---
+
+<Base title={`${theme.name} — Music in Morocco`} description={theme.description?.slice(0, 160)}>
+  <div class="section-inner">
+    <div class="page-header">
+      <span class="micro-label">{theme.category}</span>
+      <h1>{theme.name}</h1>
+      {theme.name_ar && <p class="name-ar">{theme.name_ar}</p>}
+    </div>
+    <section class="desc"><p>{theme.description}</p></section>
+  </div>
+</Base>
+
+<style>
+  .name-ar { font-size: 1.2rem; color: var(--color-ink-muted); direction: rtl; margin-top: 0.2rem; }
+  .desc p { font-size: 0.92rem; font-weight: 300; line-height: 1.65; color: var(--color-ink-light); max-width: 700px; }
+</style>

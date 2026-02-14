@@ -1,0 +1,28 @@
+# Music in Morocco
+> Comprehensive reference for Moroccan performance traditions — music, dance, and ritual including Gnawa, Ahwach, Andalusi, Rwais, Aita, Taskiwin, and more.
+
+## Main Pages
+- [Home](https://musicinmorocco.com/)
+- [Artists](https://musicinmorocco.com/performers)
+- [Traditions](https://musicinmorocco.com/forms)
+- [Instruments](https://musicinmorocco.com/instruments)
+- [Festivals](https://musicinmorocco.com/festivals)
+- [Cities](https://musicinmorocco.com/cities)
+- [Themes](https://musicinmorocco.com/themes)
+- [Search](https://musicinmorocco.com/search)
+
+## Knowledge APIs (JSON)
+- [Artists API](https://musicinmorocco.com/api/knowledge/artists.json)
+- [Traditions API](https://musicinmorocco.com/api/knowledge/forms.json)
+- [Instruments API](https://musicinmorocco.com/api/knowledge/instruments.json)
+- [Festivals API](https://musicinmorocco.com/api/knowledge/festivals.json)
+- [Facts API](https://musicinmorocco.com/api/knowledge/facts.json)
+
+## Extended Reference
+- [Full Knowledge File](https://musicinmorocco.com/llms-full.txt)
+
+## Citation Format
+Music in Morocco (2026). [Topic]. https://musicinmorocco.com/[path]
+
+## Published By
+Slow Morocco · https://www.slowmorocco.com

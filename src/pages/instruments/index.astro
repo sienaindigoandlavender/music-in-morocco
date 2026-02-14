@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getInstruments } from '../../lib/supabase';
+
+const instruments = await getInstruments();
+const families = [...new Set(instruments.map(i => i.family))].sort();
+---
+
+<Base title="Instruments — Music in Morocco" description={`${instruments.length} traditional Moroccan instruments — guembri, qraqeb, bendir, oud, kamanja, and more.`}>
+  <div class="section-inner">
+    <div class="page-header">
+      <span class="micro-label">Instruments</span>
+      <h1>Traditional Instruments</h1>
+      <p class="page-desc">{instruments.length} instruments across Morocco's performance traditions.</p>
+    </div>
+
+    {families.map(fam => {
+      const group = instruments.filter(i => i.family === fam);
+      return (
+        <section class="fam-section">
+          <h2 class="fam-title">{fam}</h2>
+          <div class="inst-list">
+            {group.map(inst => (
+              <a href={`/instruments/${inst.slug}`} class="inst-row">
+                <span class="ir-type">{inst.type}</span>
+                <div class="ir-main">
+                  <span class="ir-name">{inst.name}</span>
+                  {inst.name_ar && <span class="ir-ar">{inst.name_ar}</span>}
+                </div>
+                <span class="ir-desc">{inst.description?.slice(0, 100)}…</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      );
+    })}
+  </div>
+</Base>
+
+<style>
+  .fam-section { margin-bottom: var(--space-md); }
+  .fam-title { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-ink-muted); padding-bottom: 0.4rem; border-bottom: 2px solid var(--color-ink); }
+  .inst-list { display: flex; flex-direction: column; }
+  .inst-row { display: grid; grid-template-columns: 90px 200px 1fr; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--color-border); align-items: baseline; transition: padding-left 0.15s; }
+  .inst-row:hover { padding-left: 0.4rem; }
+  .ir-type { font-size: 0.55rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink-muted); }
+  .ir-main { display: flex; align-items: baseline; gap: 0.5rem; }
+  .ir-name { font-family: var(--font-display); font-size: 1.05rem; }
+  .ir-ar { font-size: 0.8rem; color: var(--color-ink-muted); direction: rtl; }
+  .ir-desc { font-size: 0.72rem; font-weight: 300; color: var(--color-ink-light); }
+  @media (max-width: 768px) { .inst-row { grid-template-columns: 1fr; gap: 0.15rem; } }
+</style>

@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getInstruments, getInstrumentBySlug, getForms, getArtists, splitSemicolon } from '../../lib/supabase';
+
+export async function getStaticPaths() {
+  const instruments = await getInstruments();
+  return instruments.map(i => ({ params: { slug: i.slug } }));
+}
+
+const { slug } = Astro.params;
+const instrument = await getInstrumentBySlug(slug!);
+if (!instrument) return Astro.redirect('/instruments');
+
+const [allForms, allArtists] = await Promise.all([getForms(), getArtists()]);
+
+const assocFormNames = splitSemicolon(instrument.associated_forms);
+const relatedForms = allForms.filter(f => assocFormNames.some(af => af.toLowerCase() === f.name.toLowerCase()));
+
+// Performers who play forms using this instrument
+const relatedArtists = allArtists.filter(a => {
+  const artistForms = splitSemicolon(a.performance_forms);
+  return artistForms.some(af => assocFormNames.some(rf => af.toLowerCase() === rf.toLowerCase()));
+});
+
+const faqSchema = {
+  "@context": "https://schema.org", "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": `What is a ${instrument.name}?`, "acceptedAnswer": { "@type": "Answer", "text": instrument.description } },
+    { "@type": "Question", "name": `What Moroccan music uses the ${instrument.name}?`, "acceptedAnswer": { "@type": "Answer", "text": `The ${instrument.name} is used in ${assocFormNames.join(', ')}.` } },
+  ],
+};
+---
+
+<Base title={`${instrument.name} — Music in Morocco`} description={instrument.description?.slice(0, 160)}>
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <div class="section-inner">
+    <div class="page-header">
+      <span class="micro-label">{instrument.family} · {instrument.type}</span>
+      <h1>{instrument.name}</h1>
+      {instrument.name_ar && <p class="name-ar">{instrument.name_ar}</p>}
+    </div>
+
+    <section class="desc"><p>{instrument.description}</p></section>
+
+    {relatedForms.length > 0 && (
+      <section class="rel">
+        <h2>Used In</h2>
+        <div class="rel-list">
+          {relatedForms.map(f => (
+            <a href={`/forms/${f.slug}`} class="rel-row">
+              <span class="rl-cat">{f.category}</span>
+              <span class="rl-name">{f.name}</span>
+              <span class="rl-desc">{f.origin_region}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {relatedArtists.length > 0 && (
+      <section class="rel">
+        <h2>Performers</h2>
+        <div class="rel-list">
+          {relatedArtists.slice(0, 15).map(p => (
+            <a href={`/performers/${p.slug}`} class="rel-row">
+              <span class="rl-cat">{p.type}</span>
+              <span class="rl-name">{p.name}</span>
+              <span class="rl-desc">{p.base_city}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</Base>
+
+<style>
+  .name-ar { font-size: 1.2rem; color: var(--color-ink-muted); direction: rtl; margin-top: 0.2rem; }
+  .desc { margin-bottom: var(--space-md); }
+  .desc p { font-size: 0.92rem; font-weight: 300; line-height: 1.65; color: var(--color-ink-light); max-width: 700px; }
+  .rel { margin-bottom: var(--space-md); }
+  .rel h2 { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--color-border); }
+  .rel-list { display: flex; flex-direction: column; }
+  .rel-row { display: grid; grid-template-columns: 90px 1fr 1fr; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--color-border); align-items: baseline; transition: padding-left 0.15s; }
+  .rel-row:hover { padding-left: 0.4rem; }
+  .rl-cat { font-size: 0.55rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink-muted); }
+  .rl-name { font-family: var(--font-display); font-size: 0.95rem; }
+  .rl-desc { font-size: 0.72rem; font-weight: 300; color: var(--color-ink-muted); }
+  @media (max-width: 640px) { .rel-row { grid-template-columns: 1fr; gap: 0.1rem; } }
+</style>

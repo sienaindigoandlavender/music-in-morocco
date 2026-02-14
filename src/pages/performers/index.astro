@@ -1,0 +1,133 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getArtists, splitSemicolon, isActive } from '../../lib/supabase';
+
+const artists = await getArtists();
+
+// Sort alphabetically, group by first letter
+const sorted = [...artists].sort((a, b) => a.name.localeCompare(b.name));
+const letters = [...new Set(sorted.map(a => a.name[0].toUpperCase()))];
+
+// Type icons
+const typeIcon: Record<string, string> = {
+  'SOLO': '◆',
+  'GROUP': '◇',
+  'ENSEMBLE': '○',
+  'DUO': '◈',
+};
+
+const faqSchema = {
+  "@context": "https://schema.org", "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "How many musicians are documented in Music in Morocco?", "acceptedAnswer": { "@type": "Answer", "text": `Music in Morocco documents ${artists.length} performers spanning Gnawa masters, Amazigh folk-rock bands, Rwais poets, Chaabi singers, and traditional ensembles across Morocco.` } },
+    { "@type": "Question", "name": "Who are the most important Gnawa musicians?", "acceptedAnswer": { "@type": "Answer", "text": "Key Gnawa musicians include Maalem Mahmoud Guinea, Maalem Mustapha Bakbou, Maalem Hassan Boussou, Maalem Abdelkebir Merchane, Hamid El Kasri, Hassan Hakmoun, and Majid Bekkas." } },
+  ],
+};
+---
+
+<Base title="Artists — Music in Morocco" description={`Directory of ${artists.length} Moroccan performers — Gnawa masters, folk-rock bands, Rwais poets, and traditional ensembles.`}>
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <div class="section-inner">
+    <div class="page-header">
+      <span class="micro-label">Directory</span>
+      <h1>Artists</h1>
+      <p class="page-desc">{artists.length} performers across Morocco's performance traditions.</p>
+    </div>
+
+    <!-- Icon key -->
+    <div class="icon-key">
+      <span><b>◆</b> Solo</span>
+      <span><b>◇</b> Group</span>
+      <span><b>○</b> Ensemble</span>
+    </div>
+
+    <!-- Letter jump nav -->
+    <nav class="letter-nav">
+      {letters.map(l => <a href={`#letter-${l}`}>{l}</a>)}
+    </nav>
+
+    <!-- Artist file cards -->
+    <div class="card-list">
+      {letters.map(letter => {
+        const group = sorted.filter(a => a.name[0].toUpperCase() === letter);
+        return (
+          <>
+            <div class="letter-marker" id={`letter-${letter}`}>{letter}</div>
+            {group.map(a => {
+              const forms = splitSemicolon(a.performance_forms);
+              const active = isActive(a);
+              const icon = typeIcon[a.type] || '◆';
+              return (
+                <a href={`/performers/${a.slug}`} class="file-card">
+                  <div class="fc-top">
+                    <div class="fc-left">
+                      <span class="fc-icon">{icon}</span>
+                      <span class="fc-name">{a.name}</span>
+                      {a.name_ar && <span class="fc-arabic">{a.name_ar}</span>}
+                    </div>
+                    <div class="fc-right">
+                      {a.active_since && <span class="fc-year">{a.active_since}–{!active ? a.status.match(/\d{4}/)?.[0] || '' : ''}</span>}
+                      {!active && <span class="fc-inactive">{a.status}</span>}
+                    </div>
+                  </div>
+                  <p class="fc-bio">{a.biography?.slice(0, 120)}{a.biography && a.biography.length > 120 ? '…' : ''}</p>
+                  <div class="fc-meta">
+                    {forms.map(f => <span class="fc-tag">{f}</span>)}
+                    <span class="fc-city">{a.base_city}</span>
+                  </div>
+                </a>
+              );
+            })}
+          </>
+        );
+      })}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .icon-key { display: flex; gap: 1.2rem; font-size: 0.65rem; color: var(--color-ink-muted); margin-bottom: 0.8rem; }
+  .icon-key b { font-size: 0.8rem; margin-right: 0.2rem; }
+
+  .letter-nav { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--color-border); }
+  .letter-nav a { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; color: var(--color-ink-muted); padding: 0.2rem 0.45rem; transition: color 0.15s; }
+  .letter-nav a:hover { color: var(--color-ink); }
+
+  .card-list { display: flex; flex-direction: column; }
+
+  .letter-marker {
+    font-family: var(--font-display); font-size: 2rem; font-weight: 400;
+    padding: 1.5rem 0 0.3rem; color: var(--color-ink);
+    border-bottom: 2px solid var(--color-ink); margin-bottom: 0;
+    scroll-margin-top: 4rem;
+  }
+
+  .file-card {
+    display: block; padding: 0.8rem 0;
+    border-bottom: 1px solid var(--color-border);
+    transition: padding-left 0.15s;
+  }
+  .file-card:hover { padding-left: 0.5rem; }
+
+  .fc-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+  .fc-left { display: flex; align-items: baseline; gap: 0.5rem; }
+  .fc-right { display: flex; align-items: baseline; gap: 0.6rem; }
+
+  .fc-icon { font-size: 0.7rem; color: var(--color-ink-muted); }
+  .fc-name { font-family: var(--font-display); font-size: 1.1rem; }
+  .fc-arabic { font-size: 0.8rem; color: var(--color-ink-muted); direction: rtl; }
+  .fc-year { font-size: 0.65rem; font-weight: 400; color: var(--color-ink-muted); font-variant-numeric: tabular-nums; }
+  .fc-inactive { font-size: 0.55rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-muted); }
+
+  .fc-bio { font-size: 0.78rem; font-weight: 300; color: var(--color-ink-light); line-height: 1.4; margin-top: 0.2rem; }
+
+  .fc-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.35rem; align-items: center; }
+  .fc-tag { font-size: 0.55rem; font-weight: 500; letter-spacing: 0.06em; padding: 0.12rem 0.4rem; border: 1px solid var(--color-border); color: var(--color-ink-muted); }
+  .fc-city { font-size: 0.6rem; color: var(--color-ink-muted); margin-left: auto; }
+
+  @media (max-width: 640px) {
+    .fc-top { flex-direction: column; gap: 0.2rem; }
+    .fc-right { align-self: flex-start; }
+  }
+</style>

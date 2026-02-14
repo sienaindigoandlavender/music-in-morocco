@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCities, getArtists, getFestivals } from '../../lib/supabase';
+
+const [cities, artists, festivals] = await Promise.all([getCities(), getArtists(), getFestivals()]);
+
+const cityData = cities.map(c => {
+  const artistCount = artists.filter(a => a.base_city.toLowerCase() === c.name.toLowerCase()).length;
+  const festivalCount = festivals.filter(f => f.city.toLowerCase() === c.name.toLowerCase()).length;
+  return { ...c, artistCount, festivalCount };
+}).sort((a, b) => (b.artistCount + b.festivalCount) - (a.artistCount + a.festivalCount));
+---
+
+<Base title="Cities — Music in Morocco" description={`${cities.length} Moroccan cities — performance traditions, festivals, and artists by city.`}>
+  <div class="section-inner">
+    <div class="page-header">
+      <span class="micro-label">Geography</span>
+      <h1>Cities</h1>
+      <p class="page-desc">{cities.length} cities across Morocco's musical landscape.</p>
+    </div>
+
+    <div class="city-list">
+      {cityData.map(c => (
+        <a href={`/cities/${c.slug}`} class="city-row">
+          <div class="c-main">
+            <span class="c-name">{c.name}</span>
+            {c.name_ar && <span class="c-ar">{c.name_ar}</span>}
+          </div>
+          <span class="c-region">{c.region}</span>
+          <span class="c-stats">{c.artistCount} artists · {c.festivalCount} festivals</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .city-list { display: flex; flex-direction: column; }
+  .city-row { display: grid; grid-template-columns: 1fr 180px auto; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid var(--color-border); align-items: baseline; transition: padding-left 0.15s; }
+  .city-row:hover { padding-left: 0.4rem; }
+  .c-main { display: flex; align-items: baseline; gap: 0.5rem; }
+  .c-name { font-family: var(--font-display); font-size: 1.1rem; }
+  .c-ar { font-size: 0.8rem; color: var(--color-ink-muted); direction: rtl; }
+  .c-region { font-size: 0.65rem; color: var(--color-ink-muted); }
+  .c-stats { font-size: 0.65rem; font-weight: 500; color: var(--color-ink-muted); text-align: right; }
+  @media (max-width: 640px) { .city-row { grid-template-columns: 1fr; gap: 0.15rem; } }
+</style>
