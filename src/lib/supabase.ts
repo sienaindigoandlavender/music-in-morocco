@@ -1,19 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 
+// =============================================================================
+// HARD-CODED DATA (no longer fetched from Supabase)
+// =============================================================================
+import { mimArtists } from './data/artists';
+import { mimCities } from './data/cities';
+import { mimFestivals } from './data/festivals';
+import { mimForms } from './data/forms';
+import { mimInstruments } from './data/instruments';
+import { mimRegions } from './data/regions';
+import { mimSettings } from './data/settings';
+import { mimThemes } from './data/themes';
+
+// =============================================================================
+// NEXUS SUPABASE CLIENT — Shared across all brands (STILL LIVE)
+// =============================================================================
+
 const SITE_ID = 'mim';
-
-// ============ SUPABASE CLIENT ============
-
-let supabaseInstance: ReturnType<typeof createClient> | null = null;
-
-function getSupabase() {
-  if (!supabaseInstance) {
-    const url = import.meta.env.PUBLIC_SUPABASE_URL || process.env.PUBLIC_SUPABASE_URL || '';
-    const key = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY || '';
-    supabaseInstance = createClient(url, key);
-  }
-  return supabaseInstance;
-}
 
 let nexusInstance: ReturnType<typeof createClient> | null = null;
 
@@ -76,81 +79,65 @@ export interface NexusFooterLink {
   link_order: number; link_label: string; link_url: string;
 }
 
-// ============ DATA FETCHERS ============
+// ============ DATA FETCHERS (now hard-coded) ============
 
 export async function getArtists(): Promise<Artist[]> {
-  const { data } = await getSupabase().from('mim_artists').select('*').order('name');
-  return data || [];
+  return mimArtists as unknown as Artist[];
 }
 
 export async function getArtistBySlug(slug: string): Promise<Artist | null> {
-  const { data } = await getSupabase().from('mim_artists').select('*').eq('slug', slug).single();
-  return data;
+  return (mimArtists as unknown as Artist[]).find(a => a.slug === slug) || null;
 }
 
 export async function getForms(): Promise<PerformanceForm[]> {
-  const { data } = await getSupabase().from('mim_forms').select('*').order('name');
-  return data || [];
+  return mimForms as unknown as PerformanceForm[];
 }
 
 export async function getFormBySlug(slug: string): Promise<PerformanceForm | null> {
-  const { data } = await getSupabase().from('mim_forms').select('*').eq('slug', slug).single();
-  return data;
+  return (mimForms as unknown as PerformanceForm[]).find(f => f.slug === slug) || null;
 }
 
 export async function getFestivals(): Promise<Festival[]> {
-  const { data } = await getSupabase().from('mim_festivals').select('*').order('name');
-  return data || [];
+  return mimFestivals as unknown as Festival[];
 }
 
 export async function getFestivalBySlug(slug: string): Promise<Festival | null> {
-  const { data } = await getSupabase().from('mim_festivals').select('*').eq('slug', slug).single();
-  return data;
+  return (mimFestivals as unknown as Festival[]).find(f => f.slug === slug) || null;
 }
 
 export async function getCities(): Promise<City[]> {
-  const { data } = await getSupabase().from('mim_cities').select('*').order('name');
-  return data || [];
+  return mimCities as unknown as City[];
 }
 
 export async function getCityBySlug(slug: string): Promise<City | null> {
-  const { data } = await getSupabase().from('mim_cities').select('*').eq('slug', slug).single();
-  return data;
+  return (mimCities as unknown as City[]).find(c => c.slug === slug) || null;
 }
 
 export async function getRegions(): Promise<Region[]> {
-  const { data } = await getSupabase().from('mim_regions').select('*').order('name');
-  return data || [];
+  return mimRegions as unknown as Region[];
 }
 
 export async function getInstruments(): Promise<Instrument[]> {
-  const { data } = await getSupabase().from('mim_instruments').select('*').order('name');
-  return data || [];
+  return mimInstruments as unknown as Instrument[];
 }
 
 export async function getInstrumentBySlug(slug: string): Promise<Instrument | null> {
-  const { data } = await getSupabase().from('mim_instruments').select('*').eq('slug', slug).single();
-  return data;
+  return (mimInstruments as unknown as Instrument[]).find(i => i.slug === slug) || null;
 }
 
 export async function getThemes(): Promise<Theme[]> {
-  const { data } = await getSupabase().from('mim_themes').select('*').order('name');
-  return data || [];
+  return mimThemes as unknown as Theme[];
 }
 
 export async function getThemeBySlug(slug: string): Promise<Theme | null> {
-  const { data } = await getSupabase().from('mim_themes').select('*').eq('slug', slug).single();
-  return data;
+  return (mimThemes as unknown as Theme[]).find(t => t.slug === slug) || null;
 }
 
 export async function getSiteSettings(): Promise<Record<string, string>> {
-  const { data } = await getSupabase().from('mim_settings').select('*');
-  const map: Record<string, string> = {};
-  (data || []).forEach((r: any) => { map[r.key] = r.value; });
-  return map;
+  return mimSettings;
 }
 
-// ============ RELATIONAL HELPERS ============
+// ============ RELATIONAL HELPERS (unchanged) ============
 
 function slugify(text: string): string {
   return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
@@ -191,7 +178,7 @@ export function isActive(artist: Artist): boolean {
   return !s.includes('deceased') && !s.includes('inactive');
 }
 
-// ============ NEXUS ============
+// ============ NEXUS (STILL USES SUPABASE — UNCHANGED) ============
 
 export async function getNexusFooterLinks(): Promise<NexusFooterLink[]> {
   const { data } = await getNexus().from('nexus_footer_links').select('*').eq('brand_id', SITE_ID).order('column_number').order('link_order');
