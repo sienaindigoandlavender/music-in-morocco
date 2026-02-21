@@ -10,6 +10,7 @@ import { getSiteSettings, getNexusLegalPages } from '../lib/supabase';
 
 const settings = await getSiteSettings();
 const legalPages = await getNexusLegalPages();
+const uniqueLegalPages = legalPages.filter((p, i, arr) => arr.findIndex(x => x.page_title === p.page_title) === i);
 
 const desc = description || settings.meta_description || 'Music in Morocco — music, dance, and ritual performance traditions across Morocco.';
 const currentPath = Astro.url.pathname;
@@ -130,7 +131,7 @@ const canonicalUrl = `${SITE}${canonicalPath}`;
     <div class="footer-l2">
       <div class="footer-l2-inner">
         <div class="footer-legal">
-          {legalPages.map(p => <a href={`/legal/${p.page_id}`}>{p.page_title}</a>)}
+          {uniqueLegalPages.map(p => <a href={`/legal/${p.page_id}`}>{p.page_title}</a>)}
         </div>
       </div>
     </div>
