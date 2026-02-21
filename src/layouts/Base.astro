@@ -137,8 +137,7 @@ const canonicalUrl = `${SITE}${canonicalPath}`;
     <div class="footer-l3">
       <div class="footer-l3-inner">
         <div class="footer-copy">
-          <span>© {new Date().getFullYear()} Slow Morocco</span>
-          <a href="https://www.slowmorocco.com/" target="_blank" rel="noopener">Powered by Slow Morocco</a>
+          <span>A <a href="https://www.slowmorocco.com" target="_blank" rel="noopener">Slow Morocco</a> project / Powered by <a href="https://www.dancingwiththelions.com" target="_blank" rel="noopener">Dancing with Lions</a></span>
         </div>
       </div>
     </div>
@@ -189,18 +188,19 @@ const canonicalUrl = `${SITE}${canonicalPath}`;
   .main-nav a:hover { color: var(--color-ink); }
 
   .site-footer { border-top: 1px solid var(--color-border); margin-top: var(--space-lg); }
-  .footer-l1 { background: #1f1f1f; padding: var(--space-md); }
-  .footer-l2 { background: #161616; padding: var(--space-sm) var(--space-md); }
+  .footer-l1 { background: #1f1f1f; padding: 1.25rem var(--space-md); }
+  .footer-l2 { background: #161616; padding: 1rem var(--space-md); }
   .footer-l3 { background: #0e0e0e; padding: 0.8rem var(--space-md); }
   .footer-l1-inner, .footer-l2-inner, .footer-l3-inner { max-width: 1200px; margin: 0 auto; }
-  .footer-site-links { display: flex; gap: 1.2rem; flex-wrap: wrap; }
-  .footer-site-links a { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); transition: color 0.15s; }
-  .footer-site-links a:hover { color: rgba(255,255,255,0.9); }
-  .footer-legal { display: flex; gap: 1rem; flex-wrap: wrap; }
-  .footer-legal a { font-size: 0.55rem; color: rgba(255,255,255,0.35); transition: color 0.15s; }
-  .footer-legal a:hover { color: rgba(255,255,255,0.6); }
-  .footer-copy { font-size: 0.5rem; color: rgba(255,255,255,0.25); display: flex; justify-content: space-between; align-items: center; }
-  .footer-copy a { color: rgba(255,255,255,0.35); }
+  .footer-site-links { display: flex; gap: 1.2rem; flex-wrap: wrap; align-items: center; }
+  .footer-site-links a { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.9); transition: color 0.15s; }
+  .footer-site-links a:hover { color: rgba(255,255,255,1); }
+  .footer-legal { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+  .footer-legal a { font-size: 0.55rem; color: rgba(255,255,255,0.85); transition: color 0.15s; }
+  .footer-legal a:hover { color: rgba(255,255,255,1); }
+  .footer-copy { font-size: 0.5rem; color: rgba(255,255,255,0.7); display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.15em; }
+  .footer-copy a { color: rgba(255,255,255,0.9); font-size: inherit; text-transform: inherit; letter-spacing: inherit; }
+  .footer-copy a:hover { color: rgba(255,255,255,1); }
 
   @media (max-width: 768px) {
     .main-nav { display: none; }
